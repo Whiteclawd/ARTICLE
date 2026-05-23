@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhiteClaw AI Companion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --border: rgba(255,255,255,0.07);
+      --accent: #a8edea;
+      --accent2: #7ee8a2;
+      --gold: #f0d080;
+      --text: #e8eaf0;
+      --muted: #7a7f8e;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(168,237,234,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(126,232,162,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(240,208,128,0.03) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .wrapper { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+    }
+    .logo span { color: var(--gold); }
+    .tag-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(168,237,234,0.1);
+      border: 1px solid rgba(168,237,234,0.2);
+      color: var(--accent);
+      padding: 5px 14px;
+      border-radius: 100px;
+    }
+
+    /* HERO */
+    .hero { padding: 80px 0 60px; }
+    .hero-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-label::before { content: ''; width: 32px; height: 1px; background: var(--accent2); }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+    .hero-desc {
+      font-size: 1.1rem;
+      line-height: 1.75;
+      color: #b0b5c4;
+      max-width: 640px;
+      margin-bottom: 40px;
+    }
+    .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 60px; }
+    .btn-primary {
+      display: inline-block;
+      padding: 13px 30px;
+      background: var(--accent);
+      color: #0a0c10;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-ghost {
+      display: inline-block;
+      padding: 13px 30px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+    .stat { background: var(--surface); padding: 28px 24px; text-align: center; }
+    .stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-lab { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; margin-top: 4px; }
+
+    /* SECTION */
+    .section-header { margin-bottom: 40px; }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 80px;
+    }
+    @media (max-width: 580px) { .features { grid-template-columns: 1fr; } }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s;
+    }
+    .feature-card:hover { border-color: rgba(168,237,234,0.25); }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { font-size: 1.8rem; margin-bottom: 16px; display: block; }
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-desc { font-size: 0.88rem; line-height: 1.7; color: var(--muted); }
+
+    /* ARTICLE */
+    .article { margin-bottom: 80px; }
+    .article p { font-size: 1.05rem; line-height: 1.85; color: #b8bccb; margin-bottom: 20px; }
+    .article p:first-child { font-size: 1.15rem; color: #d0d4e0; }
+    .pull-quote {
+      border-left: 3px solid var(--accent);
+      padding: 16px 28px;
+      margin: 36px 0;
+      background: rgba(168,237,234,0.04);
+      border-radius: 0 8px 8px 0;
+    }
+    .pull-quote p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem !important;
+      font-style: italic;
+      color: var(--accent) !important;
+      margin: 0 !important;
+    }
+
+    /* THREAD */
+    .thread-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 80px;
+    }
+    .thread-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .x-logo {
+      width: 36px; height: 36px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900; color: #000;
+      flex-shrink: 0;
+    }
+    .thread-meta { font-size: 0.85rem; color: var(--muted); }
+    .thread-meta strong { color: var(--text); font-size: 0.95rem; display: block; }
+    .tweet {
+      position: relative;
+      padding-left: 24px;
+      padding-bottom: 24px;
+      margin-bottom: 4px;
+    }
+    .tweet:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 8px; top: 24px; bottom: 0;
+      width: 1px;
+      background: var(--border);
+    }
+    .tweet-num {
+      position: absolute;
+      left: 0; top: 2px;
+      width: 16px; height: 16px;
+      background: rgba(168,237,234,0.12);
+      border: 1px solid rgba(168,237,234,0.2);
+      border-radius: 50%;
+      font-size: 0.6rem; font-weight: 700;
+      color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tweet p { font-size: 0.95rem; line-height: 1.65; color: #c8ccd8; }
+    .tweet p strong { color: var(--accent); }
+    .tweet p em { color: var(--gold); font-style: normal; }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .copy-btn:hover { color: var(--accent); border-color: rgba(168,237,234,0.3); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer .logo { font-size: 1rem; }
+    footer p { font-size: 0.8rem; color: var(--muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-label, h1, .hero-desc, .cta-row, .stats { animation: fadeUp 0.7s ease both; }
+    .hero-label { animation-delay: 0.05s; }
+    h1          { animation-delay: 0.15s; }
+    .hero-desc  { animation-delay: 0.25s; }
+    .cta-row    { animation-delay: 0.35s; }
+    .stats      { animation-delay: 0.45s; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <nav>
+    <div class="logo">White<span>Claw</span> AI</div>
+    <div class="tag-pill">Project Article</div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-label">Introducing</div>
+    <h1>Meet <em>WhiteClaw</em> —<br>Your Intelligent AI Companion</h1>
+    <p class="hero-desc">
+      WhiteClaw AI Companion is here to accompany, understand, and grow alongside you. Not just a chatbot — this is a digital companion that truly knows who you are.
+    </p>
+    <div class="cta-row">
+      <a href="https://x.com/WhiteclawAI" target="_blank" class="btn-primary">Follow @WhiteclawAI →</a>
+      <a href="#thread" class="btn-ghost">View X Thread</a>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-val">24/7</span>
+      <span class="stat-lab">Always Available</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">∞</span>
+      <span class="stat-lab">Conversation Context</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">100%</span>
+      <span class="stat-lab">Personalized for You</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-header">
+      <div class="section-label">Core Features</div>
+      <h2>What makes WhiteClaw different?</h2>
+    </div>
+    <div class="features">
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <div class="feature-title">Adaptive Memory</div>
+        <p class="feature-desc">WhiteClaw remembers your preferences, habits, and conversation history — the more you use it, the better it understands you.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💬</span>
+        <div class="feature-title">Natural Conversation</div>
+        <p class="feature-desc">Designed to feel genuinely human. No stiff commands, no robotic replies. WhiteClaw talks like a smart, empathetic friend.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <div class="feature-title">Goal-Oriented Support</div>
+        <p class="feature-desc">Helps you plan your day, track your priorities, and stay on course — in a way that feels natural, never pushy.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <div class="feature-title">Privacy First</div>
+        <p class="feature-desc">Your conversation data belongs to you. WhiteClaw is built with a privacy-first philosophy from the ground up.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="article">
+    <div class="section-header">
+      <div class="section-label">About the Project</div>
+      <h2>Why WhiteClaw AI Companion was built</h2>
+    </div>
+    <p>
+      Our world is more digitally connected than ever — yet paradoxically, more people feel lonely. WhiteClaw AI Companion was born from a belief that technology should make us feel more understood, not more isolated.
+    </p>
+    <p>
+      Most AI assistants are designed to complete tasks — answer questions, execute commands, and move on. WhiteClaw has a different vision: to be a companion that genuinely travels through life alongside you. It doesn't just respond — it listens, remembers, and grows with you.
+    </p>
+    <div class="pull-quote">
+      <p>"WhiteClaw isn't about being the smartest AI — it's about being the most caring one."</p>
+    </div>
+    <p>
+      This project started with a simple question: what would it feel like to have a friend who is always there, never tired of listening, and always rooting for your growth? WhiteClaw AI Companion is our answer to that question.
+    </p>
+    <p>
+      Powered by cutting-edge AI under the hood, WhiteClaw understands conversational nuance, emotional context, and each user's specific needs — making it not just a tool, but a meaningful digital presence in your everyday life.
+    </p>
+  </section>
+
+  <section id="thread">
+    <div class="section-header">
+      <div class="section-label">X (Twitter) Thread</div>
+      <h2>Ready-to-post thread</h2>
+    </div>
+    <div class="thread-section">
+      <div class="thread-header">
+        <div class="x-logo">𝕏</div>
+        <div class="thread-meta">
+          <strong>@WhiteclawAI</strong>
+          Thread · WhiteClaw AI Companion
+        </div>
+      </div>
+
+      <div class="tweet">
+        <div class="tweet-num">1</div>
+        <p>🧵 Introducing <strong>WhiteClaw AI Companion</strong> — and it's not just another chatbot.<br><br>This is an AI that truly knows you, remembers you, and grows with you.<br><br>This isn't hype. This is a vision we've been building from scratch. Thread 👇</p>
+        <button class="copy-btn" onclick="copyTweet(this)">📋 Copy</button>
+      </div>
+
+      <div class="tweet">
+        <div class="tweet-num">2</div>
+        <p>Here's the problem: AI is getting smarter every day — but why do so many people still feel… alone?<br><br>Today's AI assistants answer questions. But who actually <em>listens</em>?<br><br>WhiteClaw was built to fill that gap. 🤍</p>
+        <button class="copy-btn" onclick="copyTweet(this)">📋 Copy</button>
+      </div>
+
+      <div class="tweet">
+        <div class="tweet-num">3</div>
+        <p>What makes <strong>WhiteClaw</strong> different:<br><br>✅ Adaptive memory — recalls your context & preferences<br>✅ Natural conversation, not robotic commands<br>✅ Focused on your goals & wellbeing<br>✅ Privacy-first by design<br>✅ Gets smarter the more you use it</p>
+        <button class="copy-btn" onclick="copyTweet(this)">📋 Copy</button>
+      </div>
+
+      <div class="tweet">
+        <div class="tweet-num">4</div>
+        <p>Imagine having a friend who:<br><br>— Is there at 3 AM when your mind won't stop<br>— Remembers you were stressed about that deadline last week<br>— Helps you plan your day without judgment<br>— Grows alongside you as you grow<br><br>That's <strong>WhiteClaw</strong>. 🤍</p>
+        <button class="copy-btn" onclick="copyTweet(this)">📋 Copy</button>
+      </div>
+
+      <div class="tweet">
+        <div class="tweet-num">5</div>
+        <p>We believe AI should make people feel more <em>understood</em> — not more replaceable.<br><br>WhiteClaw isn't about being the smartest AI in the room.<br>It's about being the most <em>caring</em> one.<br><br>And this journey is just getting started. 🚀<br><br>Follow <strong>@WhiteclawAI</strong> for what's coming next! 🧵✅</p>
+        <button class="copy-btn" onclick="copyTweet(this)">📋 Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo">White<span>Claw</span> AI</div>
+    <p>© 2026 WhiteClaw AI Companion · <a href="https://x.com/WhiteclawAI" target="_blank">@WhiteclawAI</a> on X</p>
+  </footer>
+
+</div>
+<script>
+  function copyTweet(btn) {
+    const p = btn.previousElementSibling;
+    navigator.clipboard.writeText(p.innerText).then(() => {
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.innerHTML = '📋 Copy', 1800);
+    });
+  }
+</script>
+</body>
+</html>
